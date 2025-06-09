@@ -1,0 +1,38 @@
+
+--1. გამოიტანეთ ქვედა რეგისტრში ის ქვეყნები, რომელთა სახელწოდება მთავრდება n ან m სიმბოლოზე. არ გამოიყენოთ like;
+select LOWER(c.CountryName) from dbo.Country c where RIGHT(c.CountryName,1) in ('n','m')
+
+--2. გამოიტანეთ იმ მოვლენათა სახელწოდება და ჩატარების თვე ინგლისურ ენაზე ზედა
+--რეგისტრში, რომლებიც დაკავშირებულია ოლიმპიადებთან ანუ სახელწოდებაში ან აღწერაში ფიგურირებს olympic;
+select e.EventName, UPPER( DATENAME(MM, e.EventDate)) from dbo.Event e 
+where e.EventName like '%olympic%' or e.EventDetails like '%olympic%'
+
+--3. გამოიტანეთ ის მოვლენები, რომელთა სახელწოდებაში ფიგურირებს UK და გამოტანისას UK ჩაანაცვლეთ United Kingdom -ით
+select REPLACE(e.EventName,'uk','United Kingdom') from dbo.Event e where e.EventName like '%uk%'
+
+--4. გამოიტანეთ იმ მოვლენების სახელწოდება, აღწერა და თარიღი, რომლებიც ახალ წელს მოხდა;
+select e.EventName,e.EventDetails,e.EventDate from dbo.Event e where MONTH(e.EventDate)=1 and DAY(e.EventDate)=1
+
+--5. გამოიტანეთ ყველა ველი მოვლენების ცხრილიდან იმ მოვლენებისათვის, რომელთა
+--სახელწოდებაში არ ფიგურირებს ომი (War) და რომლებიც მოხდა 21-ე საუკუნეში;
+select * from dbo.Event e where e.EventName not like '%war%' and YEAR(e.EventDate)>2000
+
+--6. გამოიტანეთ ომთან (War) დაკავშირებული მოვლენები, მოვლენის თარიღი და მის შემდეგ გასული წლების რაოდენობა;
+select e.EventName,e.EventDate,DATEDIFF(YY,e.EventDate,GETDATE()) from dbo.Event e where e.EventName like '%war%'
+
+--7. გამოიტანეთ სრული მონაცემები ზაფხულში გამართული იმ მოვლენების შესახებ, რომლებიც უკავშირდება ეკონომიკას;
+select * from dbo.Event e where MONTH(e.EventDate) in (6,7,8) and e.EventName like '%econom%'
+
+--8. გამოიტანეთ გუგლის შექმნის (მოვლენის სახელწოდება უნდა იწყებოდეს Google -ით) 50 წლის
+--იუბილეს თარიღი. არ გამოიყენოთ like;
+select e.EventDate , DATEADD(YY,50,e.EventDate) from dbo.Event e where LEFT(e.EventName,6)='google'
+
+--9. გამოიტანეთ ჯგუფ beatles -თან დაკავშირებული მოვლენის იდენტიფიკატორი (EventID), 
+--სახელწოდება და შესაბამისი თარიღის დღე ინგლისურად ერთ სტრიქონში. იდენტიფიკატორი, 
+--სახელწოდება და დღე ერთმანეთისგან გამოყავით მძიმით;
+select LTRIM(STR(e.EventID,100))  +' '+e.EventName+' '+DATENAME(DD,e.EventDate) from dbo.Event e where e.EventName like '%beatles%'
+
+--10. გამოიტანეთ იმ მოვლენების სახელწოდება და თარიღი, რომლებიც 1996 წლის მესამე
+--კვარტალში მოხდა. დამატებით მესამე სვეტში გამოიტანეთ მოვლენიდან გასული დღეების რაოდენობა.
+select e.EventName,e.EventDate,DATEDIFF(DD,e.EventDate,GETDATE()) from dbo.Event e 
+where DATEPART(QQ, e.EventDate)=3 and YEAR(e.EventDate)=1996
