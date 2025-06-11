@@ -1,0 +1,28 @@
+SELECT * FROM [cars].[dbo].[Cars]
+
+--აბრუნებს უნიკალურ მნიშვნელობებს
+select distinct c.Make  from dbo.Cars c
+
+select distinct c.Make,c.Model  from dbo.Cars c
+
+select
+c.milage,
+case c.Make
+when 'acura' then N'აკურა'
+when 'Audi' then N'აუდი'
+when 'Buick' then N'ბიუიკი'
+when 'Ford' then N'ფორდი'
+else c.Make
+end MakeGeo, c.Model
+from dbo.Cars c
+
+select
+c.milage,
+case 
+when c.Make='acura' then N'აკურა'
+when c.Make='Audi' then N'აუდი'
+when c.Make='Buick' then N'ბიუიკი'
+when c.Make='Ford' then N'ფორდი'
+else c.Make
+end MakeGeo, c.Model
+from dbo.Cars c
