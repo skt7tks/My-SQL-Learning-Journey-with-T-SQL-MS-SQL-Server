@@ -1,0 +1,82 @@
+--1. გამოიტანეთ 1980-1990 წლების მოვლენები, რომლებიც ხვდება ტრანსპორტის
+--(Transport) ან ეკონომიკის (Economy) კატეგორიაში. პირველ სვეტში გამოიტანეთ
+--კატეგორია, მეორე სვეტში მოვლენა. დაალაგეთ მოვლენის თარიღის ზრდადობის მიხედვით;
+select c.CategoryName,e.EventName from dbo.Event e
+join dbo.Category c on e.CategoryID=c.CategoryID
+where YEAR(e.EventDate) between 1980 and 1990 and c.CategoryName in ('Transport','Economy')
+
+
+--2. გამოიტანეთ გახსნასთან დაკავშირებული (EventName უნდა შეიცავდეს სიტყვას: opens)
+--მოვლენების სახელწოდება და ქვეყანა;
+select e.EventName,c.CountryName from dbo.Event e 
+join dbo.Country c on e.CountryID=c.CountryID
+where e.EventName like '%opens%'
+
+--3. გამოიტანეთ ქვეყნების სია, სადაც გაიმართა ომის კატეგორიასთან დაკავშირებული
+--მოვლენები. თითოეული ქვეყანა გამოიტანეთ მხოლოდ ერთხელ;
+select distinct t.CountryName from dbo.Event e
+join dbo.Category c on e.CategoryID=c.CategoryID
+join dbo.Country t on e.CountryID=t.CountryID
+where c.CategoryName like '%war%'
+
+--4. გამოიტანეთ გერმანიის მოვლენები, რომლებსაც ადგილი ჰქონდა გაზაფხულზე. მეორე
+--სვეტში გამოიტანეთ მოვლენის თარიღი, მესამე სვეტში მოვლენის თარიღიდან დღემდე
+--გასული წლების რაოდენობა;
+select e.EventName,e.EventDate,DATEDIFF(YY,e.EventDate,GETDATE()) from dbo.Event e
+join dbo.Country c on e.CountryID=c.CountryID
+where c.CountryName='germany' and MONTH(e.EventDate) in (3,4,5)
+
+--5. გამოიტანეთ მეცხრამეტე საუკუნის (1801-1900) მოვლენების სახელწოდებები, მეორე
+--სვეტში გამოიტანეთ იმ ქვეყნის სახელწოდება, სადაც გაიმართა მოვლენა, ხოლო მესამე
+--სვეტში კონტინენტის სახელწოდება, რომელზეც მდებარეობს ეს ქვეყანა;
+select e.EventName,c.CountryName,t.ContinentName from dbo.Event e 
+join dbo.Country c on e.CountryID=c.CountryID
+join dbo.Continent t on t.ContinentID=c.ContinentID
+where YEAR(e.EventDate) between 1801 and 1900 
+
+--6. გამოიტანეთ მოვლენების სახელწოდებები, რომლებიც იწყება რიცხვით. ასევე
+--გამოიტანეთ ქვეყნის და კონტინენტის სახელწოდებები, სადაც გაიმართა ეს მოვლენები;
+select e.EventName,c.CountryName,t.ContinentName from dbo.Event e
+join dbo.Country c on e.CountryID=c.CountryID
+join dbo.Continent t on t.ContinentID=c.ContinentID
+where LEFT(e.EventName,1) in ('0','1','2','3','4','5','6','7','8','9')
+
+--7. გამოიტანეთ კონტინენტების სახელწოდებები, სადაც გაიმართა მეცნიერებებთან და
+--ტექნოლოგიებთან (Science and technology) დაკავშირებული მოვლენები. მეორე სვეტში
+--გამოიტანეთ ქვეყნის სახელწოდება. კონტინენტი-ქვეყნის წყვილი გამოიტანეთ მხოლოდ ერთხელ;
+select distinct n.ContinentName,t.CountryName from dbo.Event e
+join dbo.Category c on c.CategoryID=e.CategoryID
+join dbo.Country t on t.CountryID=e.CountryID
+join dbo.Continent n on n.ContinentID=t.ContinentID
+where c.CategoryName='Science and technology'
+
+--8. გამოიტანეთ ევროპის (Europe) და ჩრდილოეთ ამერიკის (North America) კონტინენტებზე
+--მდებარე ქვეყნები. პირველ სვეტში გამოიტანეთ კონტინენტის სახელწოდება ქართულად,
+--მეორე სვეტში - ქვეყნის სახელწოდება ინგლისურად ზედა რეგისტრში
+select  
+case t.ContinentName
+when 'Asia' then N'აზია'
+when 'Africa' then N'აფრიკა'
+when 'Europe' then N'ევროპა'
+when 'Australasia' then N'ავსტრალია'
+when 'South America' then N'სამხრეთ ამერიკა'
+when 'North America' then N'ჩრდილოეთ ამერიკა'
+when 'Antarctic' then N'ანტარქტიდა'
+when 'Not applicable' then N'უცნობია'
+end Continent, UPPER(c.CountryName) Country
+from dbo.Country c
+join dbo.Continent t on c.ContinentID=t.ContinentID
+
+
+--მონაცემთა ბაზა TSQL2012
+--9. გამოიტანეთ ლონდონელი და მადრიდელი კლიენტების გვარი, სახელი, ქალაქი და
+--შეკვეთების თარიღები;
+select c.contactname,c.city,o.orderdate from sales.Orders o
+join sales.Customers c on o.custid=c.custid
+where c.city in ('london','madrid')
+
+--10. გამოიტანეთ იმ პროდუქტების სახელწოდება ზედა რეგისტრში, ფასი და კატეგორია,
+--რომელთა ფასი 20-დან 40-მდეა;
+select UPPER(p.productname),p.unitprice,c.categoryname from [Production].[Categories] c
+join [Production].[Products] p on p.categoryid=c.categoryid
+where p.unitprice between 20 and 40
